@@ -1,0 +1,56 @@
+# Final Project For Prediction Oil Price Using Previous 37 years oil pricing data.
+
+# Import libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Load the data
+from google.colab import files
+
+# Upload the dataset
+uploaded = files.upload()  # Choose 'BrentOilPrices.csv' during upload
+
+oil_data = pd.read_csv('BrentOilPrices.csv')  # File is saved in the current directory after upload
+
+# Preprocess the data
+oil_data['Date'] = pd.to_datetime(oil_data['Date'], format='%d-%b-%y', errors='coerce')
+oil_data['Year'] = oil_data['Date'].dt.year
+oil_data = oil_data.groupby('Year')['Price'].mean().reset_index()  # Average price per year
+
+# Prepare the data for the model
+X = oil_data[['Year']]
+y = oil_data['Price']
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the Linear Regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Predict and evaluate the model
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)  # Calculate R-squared
+
+print(f"Mean Squared Error of the model: {mse:.2f}")
+print(f"Model Accuracy (R^2): {r2 * 100:.2f}%")  # Display as a percentage
+
+# Visualization
+plt.figure(figsize=(10, 6))
+plt.scatter(X, y, color='blue', label='Actual Prices')
+plt.plot(X, model.predict(X), color='red', label='Predicted Trend')
+plt.xlabel('Year')
+plt.ylabel('Average Price')
+plt.title('Oil Price Trend and Prediction')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Predict for a manually input year
+manual_year = int(input("Enter a year to predict oil price: "))
+predicted_price = model.predict([[manual_year]])[0]
+print(f"Predicted oil price for the year {manual_year}: ${predicted_price:.2f}")
