@@ -11,9 +11,9 @@ from sklearn.metrics import mean_squared_error, r2_score
 from google.colab import files
 
 # Upload the dataset
-uploaded = files.upload()  # Choose 'BrentOilPrices.csv' during upload
+uploaded = files.upload()
 
-oil_data = pd.read_csv('BrentOilPrices.csv')  # File is saved in the current directory after upload
+oil_data = pd.read_csv('BrentOilPrices.csv') 
 
 # Preprocess the data
 oil_data['Date'] = pd.to_datetime(oil_data['Date'], format='%d-%b-%y', errors='coerce')
